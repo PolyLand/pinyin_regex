@@ -52,7 +52,13 @@ def match_label(label: Union[str, frozenset, Tuple], ch_org: str, ch: str) -> bo
     """
     # 任意字符
     if label == ".":
-        return True
+        return ch_org not in {"⟨BOS⟩", "⟨EOS⟩"}
+    
+    if label == "⟨BOS⟩":
+        return label == ch
+    
+    if label == "⟨EOS⟩":
+        return label == ch
 
     # 转义类
     if isinstance(label, str) and label.startswith("\\"):
@@ -310,15 +316,21 @@ def advance_states(states: Set[State], ch_org: str, s: str) -> Set[State]:
     """
     cur = epsilon_closure(states)
 
-    for ch in s:
-        nxt = set()
+    if s in {"⟨BOS⟩", "⟨EOS⟩"}:
         for st in cur:
             for label, to_states in st.trans.items():
-                if match_label(label, ch_org, ch):
-                    nxt |= to_states
-        cur = epsilon_closure(nxt)
-        if not cur:
-            break
+                if match_label(label, ch_org, s):
+                    cur = epsilon_closure(to_states)
+    else:
+        for ch in s:
+            nxt = set()
+            for st in cur:
+                for label, to_states in st.trans.items():
+                    if match_label(label, ch_org, ch):
+                        nxt |= to_states
+            cur = epsilon_closure(nxt)
+            if not cur:
+                break
 
     return cur
 

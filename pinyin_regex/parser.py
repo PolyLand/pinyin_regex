@@ -153,6 +153,11 @@ class Parser:
             next_char = self.get()
             if next_char is None:
                 return literal_frag("\\")
+            # 处理转义的边界符号
+            if next_char == "^":
+                return literal_frag("^")
+            if next_char == "$":
+                return literal_frag("$")
             return literal_frag("\\" + next_char)
 
         if c == "[":
@@ -166,6 +171,13 @@ class Parser:
 
         if c == ".":
             return literal_frag(".")
+        
+        # 边界符号 ^ 和 $
+        if c == "^":
+            return literal_frag("⟨BOS⟩")
+        
+        if c == "$":
+            return literal_frag("⟨EOS⟩")
 
         return literal_frag(c)
 
