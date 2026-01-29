@@ -248,20 +248,10 @@ class NFADebugger:
             transition_count = 0
 
             # 与run_pinyin_regex保持一致的逻辑
-            if isinstance(tok, dict):
-                # 对于字典token，检查pinyins字段
-                for py in tok.get("pinyins", []):
-                    st = advance_states(current, tok["char"], py)
-                    # ⭐ 如果本 token 内已经到 accept，直接成功
-                    if any(s.accept for s in st):
-                        if self.verbose:
-                            print(f"EARLY ACCEPT at step {i}")
-                        return True
-                    nxt_states |= st
-                    transition_count += 1
-            else:
-                # 对于简单字符串token
-                st = advance_states(current, tok, tok)
+            # text_to_tokens总是返回字典格式的token
+            for py in tok.get("pinyins", []):
+                st = advance_states(current, tok["char"], py)
+                # ⭐ 如果本 token 内已经到 accept，直接成功
                 if any(s.accept for s in st):
                     if self.verbose:
                         print(f"EARLY ACCEPT at step {i}")
