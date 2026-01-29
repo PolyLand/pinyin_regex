@@ -279,11 +279,30 @@ class TestPinyinUtils(unittest.TestCase):
     def test_text_to_tokens(self):
         """测试文本转换为token"""
         tokens = text_to_tokens("音乐")
-        self.assertEqual(len(tokens), 2)
-        self.assertEqual(tokens[0]["char"], "音")
-        self.assertIn("yin", tokens[0]["pinyins"])
-        self.assertEqual(tokens[1]["char"], "乐")
-        self.assertIn("yue", tokens[1]["pinyins"])
+        # 验证包含边界标记符的总token数
+        self.assertEqual(len(tokens), 4)
+        
+        # 验证开始边界标记符
+        self.assertEqual(tokens[0]["char"], "<BOS>")
+        self.assertIn("<BOS>", tokens[0]["pinyins"])
+        
+        # 验证第一个字符
+        self.assertEqual(tokens[1]["char"], "音")
+        self.assertIn("yin", tokens[1]["pinyins"])
+        self.assertIn("y", tokens[1]["pinyins"])  # 声母
+        self.assertIn("音", tokens[1]["pinyins"])  # 原始字符
+        
+        # 验证第二个字符
+        self.assertEqual(tokens[2]["char"], "乐")
+        self.assertIn("yue", tokens[2]["pinyins"])
+        self.assertIn("le", tokens[2]["pinyins"])  # 多音字
+        self.assertIn("y", tokens[2]["pinyins"])   # 声母
+        self.assertIn("l", tokens[2]["pinyins"])   # 声母(模糊音)
+        self.assertIn("乐", tokens[2]["pinyins"])  # 原始字符
+        
+        # 验证结束边界标记符
+        self.assertEqual(tokens[3]["char"], "<EOS>")
+        self.assertIn("<EOS>", tokens[3]["pinyins"])
 
 
 class TestEdgeCases(unittest.TestCase):
