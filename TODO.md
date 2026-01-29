@@ -5,6 +5,7 @@
 ## 📌 功能开发 (Features)
 
 ## 🐛 Bug 修复 (Bugs)
+- [ ] **错误处理**: debug_run实现有问题，pattern = "yin" text = "音"都会返回False
 
 ## ⚡ 优化/重构 (Optimization)
 

@@ -44,6 +44,8 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
+# Project specific
+AGENTS.md
 
 # Jupyter Notebook
 .ipynb_checkpoints/
@@ -55,3 +57,38 @@ Thumbs.db
 
 # Jupyter kernelspec
 .kernelspec/
+
+# Temporary files
+*.tmp
+*.bak
+*.temp
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Documentation builds
+docs/_build/
+docs/build/
+site/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Graphviz outputs
+*.png
+*.svg
+*.pdf
+nfa_temp.*
+test_nfa.*
