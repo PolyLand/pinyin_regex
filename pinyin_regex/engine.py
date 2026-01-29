@@ -63,11 +63,11 @@ def match_label(label: Union[str, frozenset, Tuple], ch_org: str, ch: str) -> bo
     # 转义类
     if isinstance(label, str) and label.startswith("\\"):
         if label == r"\d":
-            return ch.isdigit()
+            return ch_org.isdigit()
         if label == r"\w":
             return ch_org.isascii() and ch_org.isalnum()
         if label == r"\s":
-            return ch.isspace()
+            return ch_org.isspace()
         if label == r"\z":
             if len(ch_org) != 1:
                 return False
