@@ -136,7 +136,7 @@ class NFAVisualizer:
 
         # 创建有向图
         dot = graphviz.Digraph(comment="NFA", format=format)
-        dot.attr(rankdir="LR", size="8,5")
+        dot.attr(rankdir="LR")
         dot.attr("node", shape="circle")
 
         visited = set()
