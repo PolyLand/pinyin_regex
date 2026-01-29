@@ -1,0 +1,46 @@
+# 测试目标：边界匹配和特殊符号处理测试
+# 测试^$边界符号和.+特殊符号的匹配行为
+
+# 边界匹配测试
+# 测试1: ^yin(yue|le)$ 匹配 "音乐"
+pattern: "^yin(yue|le)$"
+text: "音乐"
+result: True
+# 说明：从开始到结束完全匹配"音乐"，应该匹配
+
+# 测试2: ^yin(yue|le)$ 不匹配 "音乐家"
+pattern: "^yin(yue|le)$"
+text: "音乐家"
+result: False
+# 说明：^$要求完全匹配，"音乐家"多了"家"，应该不匹配
+
+# 测试3: ^yin 匹配 "音乐"
+pattern: "^yin"
+text: "音乐"
+result: True
+# 说明：以yin开头，应该匹配
+
+# 测试4: yue$ 匹配 "音乐"
+pattern: "yue$"
+text: "音乐"
+result: True
+# 说明：以yue结尾，应该匹配
+
+# 特殊符号处理测试
+# 测试5: . 不应该匹配边界符
+pattern: "."
+text: ""
+result: False
+# 说明：.不应该匹配边界符号
+
+# 测试6: .+ 不应该匹配边界符号
+pattern: ".+"
+text: ""
+result: False
+# 说明：.+不应该匹配纯边界符号
+
+# 测试7: . 匹配普通字符
+pattern: "."
+text: "音"
+result: True
+# 说明：.应该匹配普通字符"音"

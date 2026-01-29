@@ -1,0 +1,38 @@
+# 测试目标：多规则组合测试
+# 测试复杂的正则表达式组合匹配能力
+
+# 测试1: yin(yue|le){2} 匹配 "音乐了"
+pattern: "yin(yue|le){2}"
+text: "音乐了"
+result: True
+# 说明：yin + (yue或le)重复2次，应该匹配"音乐了"
+
+# 测试2: yin(yue|le){2} 不匹配 "音乐"
+pattern: "yin(yue|le){2}"
+text: "音乐"
+result: False
+# 说明：需要(yue|le)重复2次，"音乐"只有1次，应该不匹配
+
+# 测试3: (y(yue|le)){2} 匹配 "音乐音乐"
+pattern: "(y(yue|le)){2}"
+text: "音乐音乐"
+result: True
+# 说明：(y+(yue|le))重复2次，"音"=(y+yue)，"乐"=(y+le)，应该匹配
+
+# 测试4: (y(yue|le)){2} 不匹配 "音乐"
+pattern: "(y(yue|le)){2}"
+text: "音乐"
+result: False
+# 说明：需要重复2次，"音"只有1次，应该不匹配
+
+# 测试5: yin(yue|le)+ 匹配 "音乐乐乐"
+pattern: "yin(yue|le)+"
+text: "音乐乐乐"
+result: True
+# 说明：yin + (yue或le)1次或多次，应该匹配
+
+# 测试6: ^yin(yue|le)$ 匹配 "音乐"
+pattern: "^yin(yue|le)$"
+text: "音乐"
+result: True
+# 说明：音乐只有yinyue，应该匹配
