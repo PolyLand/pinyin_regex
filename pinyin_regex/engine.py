@@ -69,6 +69,8 @@ def match_label(label: Union[str, frozenset, Tuple], ch_org: str, ch: str) -> bo
         if label == r"\s":
             return ch.isspace()
         if label == r"\z":
+            if len(ch_org) != 1:
+                return False
             return 0x4E00 <= ord(ch_org) <= 0x9FFF
 
     # 字符集合
