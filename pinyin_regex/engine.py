@@ -52,12 +52,12 @@ def match_label(label: Union[str, frozenset, Tuple], ch_org: str, ch: str) -> bo
     """
     # 任意字符
     if label == ".":
-        return ch_org not in {"⟨BOS⟩", "⟨EOS⟩"}
+        return ch_org not in {"<BOS>", "<EOS>"}
     
-    if label == "⟨BOS⟩":
+    if label == "<BOS>":
         return label == ch
     
-    if label == "⟨EOS⟩":
+    if label == "<EOS>":
         return label == ch
 
     # 转义类
@@ -318,7 +318,7 @@ def advance_states(states: Set[State], ch_org: str, s: str) -> Set[State]:
     """
     cur = epsilon_closure(states)
 
-    if s in {"⟨BOS⟩", "⟨EOS⟩"}:
+    if s in {"<BOS>", "<EOS>"}:
         for st in cur:
             for label, to_states in st.trans.items():
                 if match_label(label, ch_org, s):

@@ -232,7 +232,7 @@ print(f"步骤数: {debug_info['step_count']}")
     'pattern': 'yinyue',
     'text': '音乐',
     'match_result': True,
-    'tokens': [{'char': '⟨BOS⟩', 'pinyins': {'⟨BOS⟩'}}, ...],
+    'tokens': [{'char': '<BOS>', 'pinyins': {'<BOS>'}}, ...],
     'stats': {
         'transitions': 7,
         'epsilon_closures': 9,

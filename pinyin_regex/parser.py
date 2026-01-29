@@ -172,10 +172,10 @@ class Parser:
 
         # 边界符号 ^ 和 $
         if c == "^":
-            return literal_frag("⟨BOS⟩")
+            return literal_frag("<BOS>")
 
         if c == "$":
-            return literal_frag("⟨EOS⟩")
+            return literal_frag("<EOS>")
 
         return literal_frag(c)
 

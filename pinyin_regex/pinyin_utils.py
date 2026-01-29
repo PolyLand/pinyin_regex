@@ -109,7 +109,7 @@ def text_to_tokens(
     tokens = []
     
     # 添加开始边界符号
-    tokens.append({"char": "⟨BOS⟩", "pinyins": {"⟨BOS⟩"}})
+    tokens.append({"char": "<BOS>", "pinyins": {"<BOS>"}})
     
     if split_chars and isinstance(text, str):
         text = list(text)
@@ -125,6 +125,6 @@ def text_to_tokens(
         tokens.append({"char": ch, "pinyins": base})
     
     # 添加结束边界符号
-    tokens.append({"char": "⟨EOS⟩", "pinyins": {"⟨EOS⟩"}})
+    tokens.append({"char": "<EOS>", "pinyins": {"<EOS>"}})
 
     return tokens

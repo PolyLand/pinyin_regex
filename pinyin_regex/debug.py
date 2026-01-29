@@ -187,7 +187,7 @@ class NFAVisualizer:
                     safe_sym = str(sym).replace('"', '\\"')
 
                     # 根据符号类型设置颜色
-                    if isinstance(sym, str) and sym.startswith("⟨"):
+                    if isinstance(sym, str) and sym.startswith("<"):
                         # 特殊符号用紫色
                         dot.edge(state_id, target_id, label=safe_sym, color="purple")
                     else:
