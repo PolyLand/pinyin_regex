@@ -7,8 +7,8 @@
 import sys
 import os
 
-# 添加父目录到路径以便导入pinyin_regex
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 添加项目根目录到路径以便导入pinyin_regex
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from pinyin_regex.debug import PerformanceProfiler
 from pinyin_regex import pinyin_regex_match, compile_regex

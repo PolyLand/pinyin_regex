@@ -10,7 +10,7 @@ import sys
 import os
 
 # 添加项目根目录到路径，以便导入模块
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from pinyin_regex import (
     pinyin_regex_match,
@@ -172,9 +172,7 @@ def configuration_examples():
 
     print(f"模式: {pattern}, 文本: {text}")
     for use_initials, use_fuzzy, description in configs:
-        result = pinyin_regex_match(
-            pattern, text, use_initials=use_initials, use_fuzzy=use_fuzzy
-        )
+        result = pinyin_regex_match(pattern, text, use_initials=use_initials, use_fuzzy=use_fuzzy)
         print(f"  {description:25} -> {result}")
 
 

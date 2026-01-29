@@ -7,8 +7,8 @@
 import sys
 import os
 
-# 添加父目录到路径以便导入pinyin_regex
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 添加项目根目录到路径以便导入pinyin_regex
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from pinyin_regex.debug import visualize_nfa, render_nfa_graph, GRAPHVIZ_AVAILABLE
 from pinyin_regex import compile_regex
@@ -27,7 +27,7 @@ def test_graphviz_features():
     visualize_nfa(start_state, "test_graph.dot", "dot")
     if os.path.exists("test_graph.dot"):
         print("   OK DOT文件生成成功")
-        # os.remove("test_graph.dot")
+        os.remove("test_graph.dot")
     else:
         print("   FAIL DOT文件生成失败")
 
@@ -37,7 +37,7 @@ def test_graphviz_features():
         success = render_nfa_graph(start_state, "test_nfa.png", "png")
         if success and os.path.exists("test_nfa.png"):
             print("   OK PNG文件生成成功")
-            # os.remove("test_nfa.png")
+            os.remove("test_nfa.png")
         else:
             print("   FAIL PNG文件生成失败")
     else:
@@ -54,7 +54,7 @@ def test_graphviz_features():
         with open("complex_graph.dot", "r", encoding="utf-8") as f:
             lines = f.readlines()
             print(f"   文件包含 {len(lines)} 行")
-        # os.remove("complex_graph.dot")
+        os.remove("complex_graph.dot")
     else:
         print("   FAIL 复杂模式DOT文件生成失败")
 
@@ -67,14 +67,14 @@ def test_graphviz_features():
         success = render_nfa_graph(start_state3, "chinese_nfa.png", "png")
         if success and os.path.exists("chinese_nfa.png"):
             print("   OK 中文模式PNG文件生成成功")
-            # os.remove("chinese_nfa.png")
+            os.remove("chinese_nfa.png")
         else:
             print("   FAIL 中文模式PNG文件生成失败")
     else:
         visualize_nfa(start_state3, "chinese_nfa.dot", "dot")
         if os.path.exists("chinese_nfa.dot"):
             print("   OK 中文模式DOT文件生成成功")
-            # os.remove("chinese_nfa.dot")
+            os.remove("chinese_nfa.dot")
         else:
             print("   FAIL 中文模式DOT文件生成失败")
 
