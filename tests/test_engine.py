@@ -353,5 +353,69 @@ class TestPerformance(unittest.TestCase):
         self.assertLess(end_time - start_time, 2.0)
 
 
+class TestComplexCombination(unittest.TestCase):
+    """复杂规则组合测试 - 基于candidates目录审核通过的测试用例"""
+
+    def test_complex_combination_patterns(self):
+        """测试多规则组合模式"""
+        test_cases = [
+            # yin(yue|le){2} 匹配 "音乐了"
+            ("yin(yue|le){2}", "音乐了", True, "yin + (yue或le)重复2次"),
+            ("yin(yue|le){2}", "音乐", False, "需要(yue|le)重复2次，只有1次"),
+            # (y(yue|le)){2} 匹配 "音乐音乐"
+            ("(y(yue|le)){2}", "音乐音乐", True, "(y+(yue|le))重复2次"),
+            ("(y(yue|le)){2}", "音乐", False, "需要重复2次，只有1次"),
+            # yin(yue|le)+ 匹配 "音乐乐乐"
+            ("yin(yue|le)+", "音乐乐乐", True, "yin + (yue或le)1次或多次"),
+        ]
+
+        for pattern, text, expected, description in test_cases:
+            with self.subTest(pattern=pattern, text=text, description=description):
+                result = pinyin_regex_match(pattern, text)
+                self.assertEqual(
+                    result,
+                    expected,
+                    f"Pattern '{pattern}' should {'match' if expected else 'not match'} '{text}' - {description}",
+                )
+
+    def test_boundary_matching(self):
+        """测试边界匹配"""
+        test_cases = [
+            # ^$ 边界匹配
+            ("^yin(yue|le)$", "音乐", True, "从开始到结束完全匹配"),
+            ("^yin(yue|le)$", "音乐家", False, "^$要求完全匹配，多了'家'"),
+            ("^yin", "音乐", True, "以yin开头"),
+            ("yue$", "音乐", True, "以yue结尾"),
+        ]
+
+        for pattern, text, expected, description in test_cases:
+            with self.subTest(pattern=pattern, text=text, description=description):
+                result = pinyin_regex_match(pattern, text)
+                self.assertEqual(
+                    result,
+                    expected,
+                    f"Pattern '{pattern}' should {'match' if expected else 'not match'} '{text}' - {description}",
+                )
+
+    def test_special_symbols_handling(self):
+        """测试特殊符号处理"""
+        test_cases = [
+            # . 符号不应该匹配边界符
+            (".", "", False, ".不应该匹配边界符号"),
+            (".+", "", False, ".+不应该匹配纯边界符号"),
+            # . 匹配普通字符
+            (".", "音", True, ".应该匹配普通字符'音'"),
+        ]
+
+        for pattern, text, expected, description in test_cases:
+            with self.subTest(pattern=pattern, text=text, description=description):
+                result = pinyin_regex_match(pattern, text)
+                self.assertEqual(
+                    result,
+                    expected,
+                    f"Pattern '{pattern}' should {'match' if expected else 'not match'} '{text}' - {description}",
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

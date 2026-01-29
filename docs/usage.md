@@ -114,6 +114,8 @@ pinyin_regex_match("yue", "乐")  # True
 | `[]` | 字符集合 | `[yl]in` | 匹配"音" |
 | `[^]` | 否定集合 | `[^z]hong` | 不匹配"中" |
 | `.` | 任意字符 | `y.n` | 匹配"音" |
+| `^` | 行首锚点 | `^yin` | 匹配行首的"音" |
+| `$` | 行尾锚点 | `yue$` | 匹配行尾的"乐" |
 
 ### 转义序列
 
@@ -174,6 +176,132 @@ pinyin_regex_match("zong", "中", use_fuzzy=False)     # False
 # 不按字符分割（整个文本作为一个token）
 pinyin_regex_match("yinyue", "音乐", split_chars=False)  # False
 ```
+
+## 调试和开发工具
+
+### NFA可视化
+
+#### `dump_nfa(start_state)`
+打印NFA结构到控制台，用于调试和理解自动机构造。
+
+```python
+from pinyin_regex.debug import dump_nfa
+from pinyin_regex import compile_regex
+
+start_state = compile_regex("yinyue")
+dump_nfa(start_state)
+# 输出：
+# State 2500617130672  
+#   y -> 2500616414672
+# State 2500616414672  
+#   ε -> 2500616414992
+# ...
+```
+
+#### `visualize_nfa(start_state, output_file=None, format="dot")`
+生成NFA的图形化表示。
+
+```python
+from pinyin_regex.debug import visualize_nfa, render_nfa_graph
+
+# 生成DOT文件
+visualize_nfa(start_state, "nfa.dot")
+
+# 直接渲染为图片（需要安装graphviz）
+render_nfa_graph(start_state, "nfa.png", "png")
+```
+
+### 调试模式
+
+#### `debug_pattern(pattern, text, **options)`
+提供详细的匹配过程信息，包括状态变化和统计。
+
+```python
+from pinyin_regex.debug import debug_pattern
+
+debug_info = debug_pattern("yinyue", "音乐")
+print(f"匹配结果: {debug_info['match_result']}")
+print(f"Tokens: {debug_info['tokens']}")
+print(f"统计: {debug_info['stats']}")
+print(f"步骤数: {debug_info['step_count']}")
+```
+
+输出示例：
+```
+{
+    'pattern': 'yinyue',
+    'text': '音乐',
+    'match_result': True,
+    'tokens': [{'char': '<BOS>', 'pinyins': {'<BOS>'}}, ...],
+    'stats': {
+        'transitions': 7,
+        'epsilon_closures': 9,
+        'final_states': 3,
+        'accept_states': 1
+    },
+    'step_count': 10
+}
+```
+
+### 性能分析
+
+#### `PerformanceProfiler`
+用于分析编译和匹配性能。
+
+```python
+from pinyin_regex.debug import PerformanceProfiler
+
+profiler = PerformanceProfiler()
+
+# 分析编译性能
+duration = profiler.profile_compilation("yinyue")
+
+# 分析匹配性能
+duration = profiler.profile_matching("yinyue", "音乐")
+
+# 获取性能摘要
+summary = profiler.get_summary()
+print(f"编译平均时间: {summary['compilation']['average']:.6f}秒")
+print(f"匹配平均时间: {summary['matching']['average']:.6f}秒")
+```
+
+### 图形化功能
+
+#### 安装Graphviz支持
+
+为了生成PNG/SVG等格式的NFA图，需要安装graphviz：
+
+```bash
+# 安装Python包
+pip install graphviz
+
+# 安装系统工具
+# Windows: 从 https://graphviz.org/download/ 下载安装
+# macOS: brew install graphviz
+# Linux: sudo apt-get install graphviz
+```
+
+#### 高级可视化选项
+
+```python
+from pinyin_regex.debug import NFAVisualizer
+
+# 创建可视化器
+visualizer = NFAVisualizer(use_colors=True)
+
+# 生成带颜色的DOT文件
+dot_content = visualizer.generate_dot(start_state)
+
+# 直接渲染为图片
+result = visualizer.render_graphviz(start_state, "nfa.png", "png")
+```
+
+### 调试最佳实践
+
+1. **理解NFA结构**: 使用`dump_nfa`查看自动机构造
+2. **性能优化**: 使用`PerformanceProfiler`识别瓶颈
+3. **复杂模式调试**: 使用`debug_pattern`分析匹配过程
+4. **可视化展示**: 使用图形化工具直观理解模式
 
 ## API参考
 
@@ -334,7 +462,7 @@ pinyin_regex_match("li", "银行")    # False (不是有效读音)
 - 环视断言（lookahead/lookbehind）
 - 反向引用
 - 非贪婪匹配
-- 锚点（^, $）
+- 锚点（^, $） - ✅ 已支持行首行尾匹配
 
 ### Q: 如何调试匹配失败？
 
