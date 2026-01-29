@@ -9,7 +9,7 @@ import os
 from typing import Set, Dict, List, Any, Optional, Union
 from collections import defaultdict
 
-from .engine import State, epsilon_closure, Frag
+from .engine import State, epsilon_closure, advance_states
 from .pinyin_utils import text_to_tokens
 from .parser import compile_regex
 
@@ -216,11 +216,11 @@ class NFADebugger:
         self.stats = defaultdict(int)
         self.step_history: List[Dict[str, Any]] = []
 
-    def debug_run(self, frag: Frag, tokens: List[Any]) -> bool:
+    def debug_run(self, start_state: State, tokens: List[Any]) -> bool:
         """调试运行NFA，记录详细步骤
 
         Args:
-            frag: NFA片段
+            start_state: NFA起始状态（已包含accept状态设置）
             tokens: 输入token列表
 
         Returns:
@@ -229,7 +229,9 @@ class NFADebugger:
         self.stats.clear()
         self.step_history.clear()
 
-        current = epsilon_closure({frag.start})
+        # 初始化状态集合，与run_pinyin_regex保持一致
+        start_closure = epsilon_closure({start_state})
+        current = set(start_closure)
 
         if self.verbose:
             print(f"INIT: {[id(s) for s in current]}")
@@ -242,26 +244,35 @@ class NFADebugger:
             if self.verbose:
                 print(f"\nREAD TOKEN: {tok}")
 
-            nxt = set()
+            nxt_states = set()
             transition_count = 0
 
-            for s in current:
+            # 与run_pinyin_regex保持一致的逻辑
+            if isinstance(tok, dict):
                 # 对于字典token，检查pinyins字段
-                if isinstance(tok, dict):
-                    for pinyin in tok.get("pinyins", []):
-                        if pinyin in s.trans:
-                            nxt |= s.trans[pinyin]
-                            transition_count += len(s.trans[pinyin])
-                            self.stats["transitions"] += 1
-                else:
-                    # 对于简单字符串token
-                    if tok in s.trans:
-                        nxt |= s.trans[tok]
-                        transition_count += len(s.trans[tok])
-                        self.stats["transitions"] += 1
+                for py in tok.get("pinyins", []):
+                    st = advance_states(current, tok["char"], py)
+                    # ⭐ 如果本 token 内已经到 accept，直接成功
+                    if any(s.accept for s in st):
+                        if self.verbose:
+                            print(f"EARLY ACCEPT at step {i}")
+                        return True
+                    nxt_states |= st
+                    transition_count += 1
+            else:
+                # 对于简单字符串token
+                st = advance_states(current, tok, tok)
+                if any(s.accept for s in st):
+                    if self.verbose:
+                        print(f"EARLY ACCEPT at step {i}")
+                    return True
+                nxt_states |= st
+                transition_count += 1
 
             self.stats["epsilon_closures"] += 1
-            current = epsilon_closure(nxt)
+            # 与run_pinyin_regex保持一致，加入start_closure
+            nxt_states |= start_closure
+            current = nxt_states
 
             if self.verbose:
                 print(f"NOW: {[id(s) for s in current]}")
@@ -385,10 +396,10 @@ def dump_nfa(start: State) -> None:
     visualizer.dump_nfa(start)
 
 
-def debug_run(frag: Frag, tokens: List[str]) -> bool:
+def debug_run(start_state: State, tokens: List[Any]) -> bool:
     """Debug run NFA (向后兼容函数)"""
     debugger = NFADebugger(verbose=True)
-    return debugger.debug_run(frag, tokens)
+    return debugger.debug_run(start_state, tokens)
 
 
 # 新增的便捷函数
@@ -450,7 +461,7 @@ def debug_pattern(pattern: str, text: str, **options) -> Dict[str, Any]:
     """
     from . import pinyin_regex_match
 
-    # 编译模式
+    # 编译模式获取起始状态
     start_state = compile_regex(pattern.lower())
 
     # 获取tokens
@@ -461,14 +472,9 @@ def debug_pattern(pattern: str, text: str, **options) -> Dict[str, Any]:
         split_chars=options.get("split_chars", True),
     )
 
-    # 创建Frag对象
-    from .parser import Frag
-
-    frag = Frag(start_state, start_state)
-
     # 调试运行
     debugger = NFADebugger(verbose=False)
-    result = debugger.debug_run(frag, tokens)
+    result = debugger.debug_run(start_state, tokens)
 
     return {
         "pattern": pattern,

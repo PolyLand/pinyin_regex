@@ -256,6 +256,56 @@ class TestDebugModule(unittest.TestCase):
         self.assertIsInstance(time1, float)
         self.assertIsInstance(time2, float)
 
+    def test_debug_pattern_bug_fix(self):
+        """测试TODO中提到的debug_pattern bug修复
+
+        验证debug_pattern('yin', '音')返回True，与pinyin_regex_match一致
+        """
+        from pinyin_regex import pinyin_regex_match
+
+        # 具体问题用例：pattern = "yin", text = "音"
+        debug_info = debug_pattern("yin", "音")
+
+        # 验证修复后返回True
+        self.assertTrue(debug_info["match_result"])
+
+        # 验证与正常匹配函数结果一致
+        normal_result = pinyin_regex_match("yin", "音")
+        self.assertEqual(debug_info["match_result"], normal_result)
+
+        # 验证调试信息完整性
+        self.assertIn("stats", debug_info)
+        self.assertIn("step_count", debug_info)
+        self.assertIsInstance(debug_info["stats"], dict)
+        self.assertIsInstance(debug_info["step_count"], int)
+        self.assertGreater(debug_info["step_count"], 0)
+
+    def test_debug_pattern_consistency_with_normal_match(self):
+        """测试debug_pattern与pinyin_regex_match的一致性"""
+        from pinyin_regex import pinyin_regex_match
+
+        test_cases = [
+            ("yin", "音"),
+            ("yinyue", "音乐"),
+            ("yy", "音乐"),
+            ("yin(yue|le)", "音乐"),
+            ("notfound", "音乐"),
+            ("^yin$", "音"),
+            ("yin+", "音乐音乐"),
+            ("yin*", ""),
+        ]
+
+        for pattern, text in test_cases:
+            with self.subTest(pattern=pattern, text=text):
+                debug_result = debug_pattern(pattern, text)["match_result"]
+                normal_result = pinyin_regex_match(pattern, text)
+
+                self.assertEqual(
+                    debug_result,
+                    normal_result,
+                    f"debug_pattern和pinyin_regex_match结果不一致: pattern={pattern}, text={text}",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -131,9 +131,7 @@ class Parser:
 
             # 验证范围
             if max_count != float("inf") and min_count > max_count:
-                raise SyntaxError(
-                    f"min count {min_count} greater than max count {max_count}"
-                )
+                raise SyntaxError(f"min count {min_count} greater than max count {max_count}")
 
             return range_frag(atom, min_count, max_count)
 
@@ -171,11 +169,11 @@ class Parser:
 
         if c == ".":
             return literal_frag(".")
-        
+
         # 边界符号 ^ 和 $
         if c == "^":
             return literal_frag("⟨BOS⟩")
-        
+
         if c == "$":
             return literal_frag("⟨EOS⟩")
 
